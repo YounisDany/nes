@@ -1,75 +1,174 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
-  <meta property="og:image" content="https://pbs.twimg.com/media/C0IaQfEWQAAyYk6?format=webp&name=small" />
-  <meta http-equiv="refresh" content="1; URL=https://website.userlink.repl.co/c/pm66e6/aHR0cHM6Ly9uYWppei5zYQ==" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>وزارة العدل</title>
+    <title>عدد الأنشطة التجارية على Google Maps</title>
+    <!-- إضافة مكتبة خرائط Google -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMGgT9saWqnUZ1fmvMAu50aQ-foOorsOs&libraries=places"></script>
+    <!-- إضافة مكتبة أيقونات Font Awesome للحصول على رموز جذابة -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- تصميم CSS -->
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
 
+        #map-container {
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            height: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            background-color: white;
+            margin-bottom: 20px;
+            animation: fadeIn 1.5s ease-out;
+        }
 
-        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=2,shrink-to-fit=no"/>
-        <meta property="al:android:app_name" content="aladel "/>
-        <meta property="al:android:package" content="com.facebook.katana"/>
-        <meta property="al:android:url" content="najiz.sa"/>
-        <meta property="al:ios:app_name" content="najiz.sa"/>
-        <meta property="al:ios:app_store_id" content="284882215"/>
-        <meta property="al:ios:url" content="najiz.sa"/>
-        <meta name="apple-itunes-app" content="najiz"/>
-        <link rel="canonical" href="https://najiz.sa"/>
-        <meta name="description" content="صاحب الهوية:
-******9466
-نشعركم بـ اعتماد صك الحكم رقم:
-453017502
-للقضية رقم:
-39593420
-المقامة من: شركة الفا للمقاولات
- ضدكم: عبدالله علي عبدالله مباركي
+        #map {
+            width: 100%;
+            height: 100%;
+        }
 
-ويمكنكم الاطلاع على الصك عبر بوابة ناجز:
-(الرابط)"/>
-        <link rel="alternate" media="only screen and (max-width: 640px)" href="https://pbs.twimg.com/media/C0IaQfEWQAAyYk6?format=webp&name=small"/>
-        <link rel="alternate" media="handheld" href="https://images.app.goo.gl/4BgKzrGNSEx87gkQ9"/>
-        <meta property="og:type" content="article"/>
-        <meta property="og:title" content="وزارة العدل"/>
-        <meta property="og:description"صاحب الهوية:
-******9466
-نشعركم بـ اعتماد صك الحكم رقم:
-453017502
-للقضية رقم:
-39593420
-المقامة من: شركة الفا للمقاولات
- ضدكم: عبدالله علي عبدالله مباركي
+        #count-display {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            animation: slideIn 1s ease-out;
+        }
 
-ويمكنكم الاطلاع على الصك عبر بوابة ناجز:"/>
-        <meta property="og:url" content="https://najiz.sa"/>
-        <meta property="og:image" content="https://najiz.vercel.app/w.png"/>
-        <meta property="og:image:alt" content=""/>
-        <meta property="og:locale" content="en_US"/>
-        <meta name="referrer" content="origin-when-crossorigin" id="meta_referrer"/>
-        <meta name="robots" content="noodp,noydir"/>
-        <meta name="twitter:card" content="summary"/>
-        <meta name="twitter:title" content=""/>
-        <meta name="twitter:description" content="صاحب الهوية:
-******9466
-نشعركم بـ اعتماد صك الحكم رقم:
-453017502
-للقضية رقم:
-39593420
-المقامة من: شركة الفا للمقاولات
- ضدكم: عبدالله علي عبدالله مباركي
+        #count-display i {
+            margin-right: 8px;
+            color: #ff5733;
+        }
 
-ويمكنكم الاطلاع على الصك عبر بوابة ناجز:
-()"/>
-        <meta name="twitter:image" content="https://najiz.vercel.app/w.png"/>
-        <meta name="twitter:image:alt" content="وزارة العدل"/>
-        <link rel="manifest" id="MANIFEST_LINK" href="/data/manifest/" crossorigin="use-credentials"/>
-        <meta name="color-scheme" content="light"/>
-        <meta name="theme-color" content="#FFFFFF"/>
+        #filter-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        #store-list {
+            width: 90%;
+            max-width: 800px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .store-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .store-item:last-child {
+            border-bottom: none;
+        }
+
+        .store-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .store-address {
+            font-size: 14px;
+            color: #777;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+    <script>
+        let stores = [];
+
+        function initMap() {
+            const center = { lat: 25.276987, lng: 55.296249 }; // مركز الخريطة
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: center,
+                zoom: 14,
+            });
+
+            const service = new google.maps.places.PlacesService(map);
+            const request = {
+                location: center,
+                radius: '1000', // نصف القطر بالمتر لتحديد المنطقة
+                type: ['store'] // نوع النشاط التجاري
+            };
+
+            service.nearbySearch(request, (results, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    stores = results;
+                    displayStores(results);
+                    const countDisplay = document.getElementById('count-display');
+                    countDisplay.innerHTML = `<i class="fas fa-store"></i> عدد الأنشطة التجارية: ${results.length}`;
+                }
+            });
+        }
+
+        function displayStores(stores) {
+            const storeList = document.getElementById('store-list');
+            storeList.innerHTML = '';
+
+            stores.forEach(store => {
+                const storeItem = document.createElement('div');
+                storeItem.className = 'store-item';
+                storeItem.innerHTML = `
+                    <div>
+                        <div class="store-name">${store.name}</div>
+                        <div class="store-address">${store.vicinity}</div>
+                    </div>
+                `;
+                storeList.appendChild(storeItem);
+            });
+        }
+
+        function filterStores() {
+            const filterText = document.getElementById('filter-input').value.toLowerCase();
+            const filteredStores = stores.filter(store => store.name.toLowerCase().includes(filterText));
+            displayStores(filteredStores);
+        }
+    </script>
 </head>
-<body>
-    
+<body onload="initMap()">
+    <div id="map-container">
+        <div id="map"></div>
+        <div id="count-display"><i class="fas fa-spinner fa-spin"></i> تحميل البيانات...</div>
+    </div>
+
+    <div id="filter-container">
+        <input type="text" id="filter-input" placeholder="ابحث عن متجر..." onkeyup="filterStores()">
+    </div>
+
+    <div id="store-list">
+        <!-- سيتم عرض بيانات المحلات هنا -->
+    </div>
 </body>
 </html>
-
