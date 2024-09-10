@@ -6,9 +6,7 @@
     <title>عدد الأنشطة التجارية على Google Maps</title>
     <!-- إضافة مكتبة خرائط Google -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMGgT9saWqnUZ1fmvMAu50aQ-foOorsOs&libraries=places"></script>
-    <!-- إضافة مكتبة أيقونات Font Awesome للحصول على رموز جذابة -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- تصميم CSS -->
+
     <style>
         body {
             margin: 0;
@@ -117,19 +115,23 @@
             });
 
             const service = new google.maps.places.PlacesService(map);
-            const request = {
-                location: center,
-                radius: '1000', // نصف القطر بالمتر لتحديد المنطقة
-                type: ['store'] // نوع النشاط التجاري
-            };
 
-            service.nearbySearch(request, (results, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK) {
-                    stores = results;
-                    displayStores(results);
-                    const countDisplay = document.getElementById('count-display');
-                    countDisplay.innerHTML = `<i class="fas fa-store"></i> عدد الأنشطة التجارية: ${results.length}`;
-                }
+            // تحديث النتائج عند تغيير حدود الخريطة
+            map.addListener('bounds_changed', () => {
+                const bounds = map.getBounds();
+                const request = {
+                    bounds: bounds,
+                    type: ['store'] // نوع النشاط التجاري
+                };
+
+                service.nearbySearch(request, (results, status) => {
+                    if (status === google.maps.places.PlacesServiceStatus.OK) {
+                        stores = results;
+                        displayStores(results);
+                        const countDisplay = document.getElementById('count-display');
+                        countDisplay.innerHTML = `<i class="fas fa-store"></i> عدد الأنشطة التجارية: ${results.length}`;
+                    }
+                });
             });
         }
 
